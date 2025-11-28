@@ -1,0 +1,17 @@
+server:
+  port: 8080  # 指定启动端口，默认也是 8080
+
+spring:
+  datasource:
+    # 这里的 jdbc url 格式和你在 Java SE 里写的一样
+    url: jdbc:postgresql://localhost:5432/MyBlog?currentSchema=public
+    username: postgres      # 你的数据库账号
+    password: 123  # 你的数据库密码
+    driver-class-name: org.postgresql.Driver
+
+mybatis:
+  # 告诉 MyBatis 你的 XML Mapper 文件放在哪（虽然还没写，先配好）
+  mapper-locations: classpath:mapper/*.xml
+  # 开启驼峰命名转换 (create_time -> createTime)
+  configuration:
+    map-underscore-to-camel-case: true

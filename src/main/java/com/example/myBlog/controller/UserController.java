@@ -1,12 +1,11 @@
 package com.example.myBlog.controller;
 
+import com.example.myBlog.common.Result;
 import com.example.myBlog.entity.User;
 import com.example.myBlog.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -16,5 +15,28 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUserByID(@PathVariable long id){
         return userService.getUserById(id);
+    }
+
+    @PostMapping("/login")
+    public Result<User> login(@RequestBody User user, HttpSession session) {
+        // 1. 拿着用户名去数据库查
+        // (注意：这里假设你 UserMapper 里写了 selectByUserName 方法，如果没写要去补上)
+        User dbUser = userService.getUserByUsername(user.getUserName());
+
+        // 2. 判断用户是否存在
+        if (dbUser == null) {
+            return Result.error(400, "用户不存在");
+        }
+
+        // 3. 校验密码 (实际开发要加密，这里先明文比对)
+        if (!dbUser.getPassword().equals(user.getPassword())) {
+            return Result.error(400, "密码错误");
+        }
+
+        // 4. 关键一步：登录成功，把用户信息存入 Session
+        // 这就像是发了一张“门禁卡”，卡号就是 SessionID
+        session.setAttribute("currentUser", dbUser);
+
+        return Result.success(dbUser); // 把用户信息返回给前端
     }
 }

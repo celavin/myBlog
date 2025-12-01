@@ -6,6 +6,7 @@ import com.example.myBlog.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,7 +31,10 @@ public class UserController {
         }
 
 
-        if (!dbUser.getPassword().equals(user.getPassword())) {
+        //把输入的密码变成乱码再与数据库里的进行比较
+        String inputMd5 = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
+
+        if (!dbUser.getPassword().equals(inputMd5)) {
             return Result.error(400, "密码错误");
         }
 
@@ -40,9 +44,9 @@ public class UserController {
 
         return Result.success(dbUser); // 把用户信息返回给前端
     }
-    @Valid
+
     @PostMapping("/register")
-    public Result<String> register(@RequestBody User user,HttpSession session){
+    public Result<String> register(@RequestBody @Valid User user,HttpSession session){
         User dbUser = userService.getUserByUsername(user.getUserName());
         if (dbUser != null) {
             return Result.error(400, "用户已存在");
@@ -51,6 +55,7 @@ public class UserController {
         //写入数据库
         userService.insertUser(user);
         //注册完自动登录
+        session.setAttribute("currentUser", user);
         return Result.success("注册成功,已为你自动登录");
     }
 

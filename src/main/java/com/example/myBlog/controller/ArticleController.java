@@ -5,6 +5,7 @@ import com.example.myBlog.common.Result;
 import com.example.myBlog.entity.Article;
 import com.example.myBlog.entity.User;
 import com.example.myBlog.service.ArticleService;
+import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
@@ -39,8 +40,15 @@ public class ArticleController {
     }
 
     @GetMapping
-    public List<Article> list() {
-        return articleService.getAllArticles();
+// @RequestParam(defaultValue = "1") 表示：如果前端没传这个参数，就默认是 1
+    public Result<PageInfo<Article>> list(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        // 调用 Service
+        PageInfo<Article> pageInfo = articleService.getAllArticles(pageNum, pageSize);
+
+        return Result.success(pageInfo);
     }
 
     @PutMapping

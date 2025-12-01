@@ -4,6 +4,7 @@ import com.example.myBlog.entity.User;
 import com.example.myBlog.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,11 @@ public class UserService {
         //自动注入创建时间和更新时间
         user.setCreatedTime(LocalDateTime.now());
         user.setUpdatedTime(LocalDateTime.now());
+
+        //密码加密
+        String md5Password = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
+        user.setPassword(md5Password);
+
         userMapper.insertUser(user);
     }
 }

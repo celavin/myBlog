@@ -34,6 +34,7 @@ public class ArticleController {
 
     @GetMapping("/{id}")
     public Article getArticle(@PathVariable long id){
+        //待完善,需检验是否存在,否则报错
         return articleService.getArticleById(id);
     }
 
@@ -43,13 +44,13 @@ public class ArticleController {
     }
 
     @PutMapping
-    public String update(@RequestBody Article article){
+    public Result<String> update(@RequestBody Article article){
         articleService.updateArticle(article);
-        return "修改成功！";
+        return Result.success("修改成功！");
     }
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable long id){
+    public Result<String> delete(@PathVariable long id){
         articleService.deleteArticle(id);
-        return "已删除id为"+id+"文章!";
+        return Result.success("已删除id为"+id+"的文章!");
     }
 }

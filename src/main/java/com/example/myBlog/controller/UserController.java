@@ -4,6 +4,7 @@ import com.example.myBlog.common.Result;
 import com.example.myBlog.entity.User;
 import com.example.myBlog.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,20 +24,35 @@ public class UserController {
         // (注意：这里假设你 UserMapper 里写了 selectByUserName 方法，如果没写要去补上)
         User dbUser = userService.getUserByUsername(user.getUserName());
 
-        // 2. 判断用户是否存在
+
         if (dbUser == null) {
             return Result.error(400, "用户不存在");
         }
 
-        // 3. 校验密码 (实际开发要加密，这里先明文比对)
+
         if (!dbUser.getPassword().equals(user.getPassword())) {
             return Result.error(400, "密码错误");
         }
 
-        // 4. 关键一步：登录成功，把用户信息存入 Session
+        // 关键一步：登录成功，把用户信息存入 Session
         // 这就像是发了一张“门禁卡”，卡号就是 SessionID
         session.setAttribute("currentUser", dbUser);
 
         return Result.success(dbUser); // 把用户信息返回给前端
     }
+    @Valid
+    @PostMapping("/register")
+    public Result<String> register(@RequestBody User user,HttpSession session){
+        User dbUser = userService.getUserByUsername(user.getUserName());
+        if (dbUser != null) {
+            return Result.error(400, "用户已存在");
+        }
+
+        //写入数据库
+        userService.insertUser(user);
+        //注册完自动登录
+        return Result.success("注册成功,已为你自动登录");
+    }
+
+
 }

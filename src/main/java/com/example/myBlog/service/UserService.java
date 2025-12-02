@@ -1,5 +1,6 @@
 package com.example.myBlog.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.myBlog.entity.User;
 import com.example.myBlog.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,11 @@ public class UserService {
     }
 
     public User getUserByUsername(String userName){
-        return userMapper.selectByUserName(userName);
+        // 翻译：SELECT * FROM users WHERE username = ?
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", userName); // eq 表示 equal (等于)
+
+        return userMapper.selectOne(wrapper);
     }
 
     public void insertUser(User user){
@@ -29,6 +34,6 @@ public class UserService {
         String md5Password = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
         user.setPassword(md5Password);
 
-        userMapper.insertUser(user);
+        userMapper.insert(user);
     }
 }

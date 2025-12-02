@@ -34,7 +34,7 @@ public class ArticleService {
         PageHelper.startPage(pageNum, pageSize);
 
         // 2. 正常调用 Mapper (SQL 会被自动加上 LIMIT)
-        List<Article> list = articleMapper.findAll();
+        List<Article> list = articleMapper.selectAllWithAuthor();
 
         // 3. 用 PageInfo 包装查询结果
         // 它会自动计算总页数、总条数等
@@ -45,7 +45,7 @@ public class ArticleService {
         article.setCreatedTime(articleMapper.selectById(article.getId()).getCreatedTime());
         //更新时间
         article.setUpdatedTime(LocalDateTime.now());
-        articleMapper.update(article);
+        articleMapper.updateById(article);
     }
 
     public void deleteArticle(long id){
